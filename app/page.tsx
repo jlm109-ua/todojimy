@@ -2,19 +2,19 @@
 
 import { useState, useEffect } from 'react';
 import { Canvas } from '@react-three/fiber';
-import { Input } from '@/components/ui/input';
-import { Button } from '@/components/ui/button';
+import { Input } from './components/ui/input';
+import { Button } from './components/ui/button';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { Textarea } from '@/components/ui/textarea';
+} from './components/ui/select';
+import { Textarea } from './components/ui/textarea';
 import { ChevronDown, ChevronUp, Plus, Check, Trash2 } from 'lucide-react';
-import Background from '@/components/Background';
-import { supabase } from '@/lib/supabaseClient';
+import Background from './components/Background';
+import { supabase } from './lib/supabaseClient';
 
 interface Task {
   id: string;
