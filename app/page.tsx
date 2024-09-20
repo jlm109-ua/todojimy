@@ -1,20 +1,20 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect } from 'react';
 import { Canvas } from '@react-three/fiber';
-import { Input } from '@/app/components/ui/input';
-import { Button } from '@/app/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Button } from '@/components/ui/button';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/app/components/ui/select';
-import { Textarea } from '@/app/components/ui/textarea';
-import { ChevronDown, ChevronUp, Plus } from 'lucide-react';
-import Background from '@/app/components/Background';
-import { supabase } from '@/app/lib/supabaseClient';
+} from '@/components/ui/select';
+import { Textarea } from '@/components/ui/textarea';
+import { ChevronDown, ChevronUp, Plus, Check, Trash2 } from 'lucide-react';
+import Background from '@/components/Background';
+import { supabase } from '@/lib/supabaseClient';
 
 interface Task {
   id: string;
@@ -22,6 +22,7 @@ interface Task {
   description: string;
   importance: string;
   expanded: boolean;
+  completed: boolean;
 }
 
 export default function Home() {
@@ -32,24 +33,24 @@ export default function Home() {
     importance: 'medium',
   });
 
-  const fetchTasks = useCallback(async () => {
+  useEffect(() => {
+    fetchTasks();
+  }, []);
+
+  const fetchTasks = async () => {
     const { data, error } = await supabase.from('tasks').select('*');
     if (error) {
       console.error('Error fetching tasks:', error);
     } else {
       setTasks(sortTasks(data));
     }
-  }, []);
-
-  useEffect(() => {
-    fetchTasks();
-  }, [fetchTasks]);
+  };
 
   const addTask = async () => {
     if (newTask.title.trim() !== '') {
       const { data, error } = await supabase
         .from('tasks')
-        .insert([newTask])
+        .insert([{ ...newTask, completed: false }])
         .select();
       if (error) {
         console.error('Error adding task:', error);
@@ -79,6 +80,34 @@ export default function Home() {
     }
   };
 
+  const toggleCompleted = async (id: string) => {
+    const taskToUpdate = tasks.find((task) => task.id === id);
+    if (taskToUpdate) {
+      const { error } = await supabase
+        .from('tasks')
+        .update({ completed: !taskToUpdate.completed })
+        .eq('id', id);
+      if (error) {
+        console.error('Error updating task:', error);
+      } else {
+        setTasks((prevTasks) =>
+          prevTasks.map((task) =>
+            task.id === id ? { ...task, completed: !task.completed } : task
+          )
+        );
+      }
+    }
+  };
+
+  const deleteTask = async (id: string) => {
+    const { error } = await supabase.from('tasks').delete().eq('id', id);
+    if (error) {
+      console.error('Error deleting task:', error);
+    } else {
+      setTasks((prevTasks) => prevTasks.filter((task) => task.id !== id));
+    }
+  };
+
   const getImportanceColor = (importance: string) => {
     switch (importance) {
       case 'high':
@@ -102,15 +131,15 @@ export default function Home() {
   };
 
   return (
-    <div className="min-h-screen bg-black text-gray-100 p-4 relative">
+    <div className="min-h-screen bg-black text-gray-100 flex flex-col">
       <Canvas className="fixed inset-0 -z-10">
         <ambientLight intensity={0.1} />
         <pointLight position={[10, 10, 10]} />
         <Background />
       </Canvas>
-      <div className="max-w-md mx-auto space-y-4 relative z-10">
+      <div className="flex-none p-4 bg-black bg-opacity-80 z-10">
         <h1 className="text-2xl font-bold text-center mb-6">Dark ToDo App</h1>
-        <div className="space-y-2">
+        <div className="space-y-2 max-w-md mx-auto">
           <Input
             type="text"
             placeholder="Título de la tarea"
@@ -128,7 +157,7 @@ export default function Home() {
           />
           <Select
             value={newTask.importance}
-            onValueChange={(value: string) =>
+            onValueChange={(value) =>
               setNewTask({ ...newTask, importance: value })
             }
           >
@@ -148,18 +177,34 @@ export default function Home() {
             <Plus className="mr-2 h-4 w-4" /> Añadir Tarea
           </Button>
         </div>
-        <div className="space-y-2">
+      </div>
+      <div className="flex-grow overflow-auto p-4">
+        <div className="space-y-2 max-w-md mx-auto">
           {tasks.map((task) => (
             <div
               key={task.id}
               className="bg-gray-900 p-4 border border-gray-700"
             >
               <div className="flex justify-between items-center">
-                <h3 className="font-mono text-sm">{task.title}</h3>
+                <h3
+                  className={`font-mono text-sm ${task.completed ? 'line-through text-gray-500' : ''}`}
+                >
+                  {task.title}
+                </h3>
                 <div className="flex items-center space-x-2">
                   <div
                     className={`w-3 h-3 ${getImportanceColor(task.importance)}`}
                   />
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => toggleCompleted(task.id)}
+                    className="hover:bg-gray-800"
+                  >
+                    <Check
+                      className={`h-4 w-4 ${task.completed ? 'text-green-500' : 'text-gray-500'}`}
+                    />
+                  </Button>
                   <Button
                     variant="ghost"
                     size="sm"
@@ -171,6 +216,14 @@ export default function Home() {
                     ) : (
                       <ChevronDown className="h-4 w-4" />
                     )}
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => deleteTask(task.id)}
+                    className="hover:bg-gray-800"
+                  >
+                    <Trash2 className="h-4 w-4 text-red-500" />
                   </Button>
                 </div>
               </div>
