@@ -138,17 +138,17 @@ export default function Home() {
         <Background />
       </Canvas>
       <div className="flex-none p-4 bg-black bg-opacity-80 z-10">
-        <h1 className="text-2xl font-bold text-center mb-6">Dark ToDo App</h1>
+        <h1 className="text-2xl font-bold text-center mb-6">ToDoJimy</h1>
         <div className="space-y-2 max-w-md mx-auto">
           <Input
             type="text"
-            placeholder="Título de la tarea"
+            placeholder="Task title"
             value={newTask.title}
             onChange={(e) => setNewTask({ ...newTask, title: e.target.value })}
             className="bg-gray-900 border-gray-700 rounded-none font-mono text-sm"
           />
           <Textarea
-            placeholder="Descripción (opcional)"
+            placeholder="Description (optional)"
             value={newTask.description}
             onChange={(e) =>
               setNewTask({ ...newTask, description: e.target.value })
@@ -162,19 +162,19 @@ export default function Home() {
             }
           >
             <SelectTrigger className="bg-gray-900 border-gray-700 rounded-none font-mono text-sm">
-              <SelectValue placeholder="Importancia" />
+              <SelectValue placeholder="Priority" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="low">Baja</SelectItem>
-              <SelectItem value="medium">Media</SelectItem>
-              <SelectItem value="high">Alta</SelectItem>
+              <SelectItem value="low">Low</SelectItem>
+              <SelectItem value="medium">Medium</SelectItem>
+              <SelectItem value="high">High</SelectItem>
             </SelectContent>
           </Select>
           <Button
             onClick={addTask}
             className="w-full bg-blue-600 hover:bg-blue-700 rounded-none font-mono text-sm"
           >
-            <Plus className="mr-2 h-4 w-4" /> Añadir Tarea
+            <Plus className="mr-2 h-4 w-4" /> Add Task
           </Button>
         </div>
       </div>
