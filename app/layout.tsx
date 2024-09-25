@@ -17,7 +17,7 @@ export const metadata: Metadata = {
   title: 'ToDoJimy',
   description: "Jimy's personal ToDo App",
   icons: {
-    icon: 'todojimy.png'
+    icon: '/todojimy.png'
   }
 };
 
