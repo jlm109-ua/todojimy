@@ -16,6 +16,9 @@ const geistMono = localFont({
 export const metadata: Metadata = {
   title: 'ToDoJimy',
   description: "Jimy's personal ToDo App",
+  icons: {
+    icon: 'todojimy.png'
+  }
 };
 
 export default function RootLayout({
