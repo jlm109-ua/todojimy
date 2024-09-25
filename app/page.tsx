@@ -168,14 +168,23 @@ export default function Home() {
     }
   };
 
-  const updateTaskPosition = async (
+  const updateTaskPosition = (
     id: string,
     position: { x: number; y: number }
   ) => {
     setTasks((prevTasks) =>
       prevTasks.map((task) => (task.id === id ? { ...task, position } : task))
     );
-    // If necessary, update the position in the database here
+    // Update the position in the database asynchronously
+    supabase
+      .from('tasks')
+      .update({ position })
+      .eq('id', id)
+      .then(({ error }) => {
+        if (error) {
+          console.error('Error updating task position:', error);
+        }
+      });
   };
 
   const filteredTasks =
